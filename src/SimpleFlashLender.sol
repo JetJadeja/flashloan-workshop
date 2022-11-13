@@ -45,7 +45,7 @@ contract SimpleFlashLender {
 
 
         // Call the borrower's executeOnFlashLoan function.
-        borrower.executeOnFlashLoan(amount);
+        borrower.executeOnFlashLoan(TOKEN, amount);
 
         // Ensure that the tokens have been returned to the contract.
         require(TOKEN.balanceOf(address(this)) >= balance, "Borrower did not return funds");
