@@ -18,7 +18,8 @@ contract IntermediateFlashLenderTest is DSTestPlus {
         token = new MockERC20("Test Token", "TEST", 18);
         lender = new IntermediateFlashLender(ERC20(address(token)), 0.05e18); // 5% fee
 
-        token.mint(address(lender), 1000 ether);
+        token.approve(address(lender), 1000 ether);
+        lender.deposit(1000 ether);
     }
 
     function testLoan() public {
@@ -50,6 +51,10 @@ contract IntermediateFlashLenderTest is DSTestPlus {
         lender.borrow(1000, IFlashBorrower(address(borrower)));
     }
 
+    function testWithdrawFees() public {
+        testLoanSuccess();
+        lender.collectFees();
+    }
 }
 
 contract GoodBorrower {
