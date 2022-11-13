@@ -53,13 +53,13 @@ contract IntermediateFlashLenderTest is DSTestPlus {
 }
 
 contract GoodBorrower {
-    function executeOnFlashLoan(ERC20 token, uint256 amount, uint256 total) external {
+    function executeOnFlashLoan(ERC20 token, uint256, uint256 total) external {
         token.transfer(msg.sender, total);
     }
 }
 
 contract CheapBorrower {
-    function executeOnFlashLoan(ERC20 token, uint256 amount, uint256 total) external {
+    function executeOnFlashLoan(ERC20 token, uint256 amount, uint256) external {
         token.transfer(msg.sender, amount);
     }
 }
