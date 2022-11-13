@@ -24,15 +24,40 @@ contract IntermediateFlashLender {
     /// @notice The owner of the contract.
     address public immutable OWNER;
 
+    /// @notice The percentage fee that is charged on flash loans.
+    /// It is important to note that this is a "mantissa", which means that it is scaled by 1e18.
+    /// So, a fee of 100% would actually be 1e18. A fee of 5% would be 0.05e18.
+    uint256 public immutable FEE;
+
     /*///////////////////////////////////////////////////////////////
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Set up the flash lender contract.
-    constructor(ERC20 _TOKEN) {
+    constructor(ERC20 _TOKEN, uint256 _FEE) {
         // Set our immutable values.
         TOKEN = _TOKEN;
         OWNER = msg.sender;
+        FEE = _FEE;
+    }
+
+    /*///////////////////////////////////////////////////////////////
+                        FEE COLLECTION INTERFACE
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice Stores total fees collected.
+    uint256 public totalFees;
+
+    /// @notice Retrieve the fees that have been collected.
+    function collectFees() external {
+        // Ensure that the caller is the owner.
+        require(msg.sender == OWNER, "Only the owner can collect fees");
+
+        // Transfer the tokens from the contract to the owner.
+        TOKEN.safeTransfer(OWNER, totalFees);
+
+        // Reset the total fees to 0.
+        delete totalFees;
     }
 
     /*///////////////////////////////////////////////////////////////
