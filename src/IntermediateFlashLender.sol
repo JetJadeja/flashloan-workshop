@@ -70,6 +70,9 @@ contract IntermediateFlashLender {
     /// @notice Deposit funds into the flash lender contract.
     /// @param amount The amount of funds to deposit.
     function deposit(uint256 amount) external {
+        // Ensure that the contract is not already in a flash loan.
+        require(!inFlashLoan, "Already in a flash loan");
+
         // Transfer the tokens from the sender to the contract.
         // Must have tokens approved.
         TOKEN.safeTransferFrom(msg.sender, address(this), amount);
@@ -82,6 +85,9 @@ contract IntermediateFlashLender {
     /// @param amount The amount of funds to withdraw.
     /// Will fail if the liquidity provider does not have enough funds.
     function withdraw(uint256 amount) external {
+        // Ensure that the contract is not already in a flash loan.
+        require(!inFlashLoan, "Already in a flash loan");
+
         // Ensure that the liquidity provider has enough funds.
         // This technically isn't necessary. Solidity SafeMath would automatically revert.
         require(balances[msg.sender] >= amount, "Not enough funds");
@@ -97,8 +103,16 @@ contract IntermediateFlashLender {
                             LENDING INTERFACE
     //////////////////////////////////////////////////////////////*/
 
+    /// @notice Boolean indicating whether the contract is currently in a flash loan.
+    bool public inFlashLoan;
+
     /// @notice Borrow funds from the flash lender contract.
     function borrow(uint256 amount, IFlashBorrower borrower) external {
+        // Ensure that the contract is not already in a flash loan. If it is, set inFlashLoan to true.
+        // This is to prevent reentrancy.
+        require(!inFlashLoan, "Already in a flash loan");
+        inFlashLoan = true;
+
         // Store the current balance of the contract.
         uint256 balance = TOKEN.balanceOf(address(this));
 
@@ -112,5 +126,8 @@ contract IntermediateFlashLender {
 
         // Ensure that the tokens have been returned to the contract.
         require(TOKEN.balanceOf(address(this)) >= balance + fee, "Borrower did not return funds");
+
+        // Reset inFlashLoan to false.
+        inFlashLoan = false;
     }
 }
