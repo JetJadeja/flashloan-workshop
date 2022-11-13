@@ -116,6 +116,11 @@ contract AdvancedFlashLender is ERC20 {
 
     /// @notice Borrow funds from the flash lender contract.
     function borrow(uint256 amount, IFlashBorrower borrower) external {
+        // Ensure that the contract is not currently executing a flash loan.
+        // We do this to prevent a reentrancy attack where the borrower calls borrow again, which
+        // enables them to set inFlashLoan to false and bypass the isFlashLoan checks in deposit/withdraw.
+        require(!inFlashLoan, "Cannot borrow while flash loan is active");
+    
         // Set inFlashLoan to true.
         // We do this to prevent a potential attacker from taking advantage of the withdraw() function.
         // This is because the sharePrice function uses the token balance of the contract to calculate
