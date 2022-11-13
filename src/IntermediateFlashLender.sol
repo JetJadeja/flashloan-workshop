@@ -102,14 +102,15 @@ contract IntermediateFlashLender {
         // Store the current balance of the contract.
         uint256 balance = TOKEN.balanceOf(address(this));
 
-        // Transfer the tokens from the contract to the borrower.
+        // Calculate the fee and update the totalFees.
+        uint256 fee = (amount * FEE) / 1e18;
+        totalFees += fee;
+
+        // Transfer the tokens from the contract to the borrower and call the executeOnFlashLoan function.
         TOKEN.safeTransfer(address(borrower), amount);
-
-
-        // Call the borrower's executeOnFlashLoan function.
-        borrower.executeOnFlashLoan(TOKEN, amount);
+        borrower.executeOnFlashLoan(TOKEN, amount, amount + fee);
 
         // Ensure that the tokens have been returned to the contract.
-        require(TOKEN.balanceOf(address(this)) >= balance, "Borrower did not return funds");
+        require(TOKEN.balanceOf(address(this)) >= balance + fee, "Borrower did not return funds");
     }
 }
