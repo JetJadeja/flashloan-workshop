@@ -10,7 +10,7 @@ import "solmate/tokens/ERC20.sol";
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
 
-contract TestContract is DSTestPlus {
+contract SimpleFlashLenderTest is DSTestPlus {
     SimpleFlashLender lender;
     MockERC20 token;
 
@@ -44,19 +44,19 @@ contract TestContract is DSTestPlus {
 }
 
 contract GoodBorrower {
-    function executeOnFlashLoan(ERC20 token, uint256 amount) external {
+    function executeOnFlashLoan(ERC20 token, uint256 amount, uint256) external {
         token.transfer(msg.sender, amount);
     }
 }
 
 contract BadBorrower {
-    function executeOnFlashLoan(ERC20 token, uint256 amount) external {
+    function executeOnFlashLoan(ERC20 token, uint256, uint256) external {
         token.transfer(msg.sender, 0);
     }
 }
 
 contract MistakenBorrower {
-    function executeOnFlashLoan(ERC20 token, uint256 amount) external {
+    function executeOnFlashLoan(ERC20 token, uint256 amount, uint256) external {
         token.transfer(msg.sender, amount/2);
     }
 }
