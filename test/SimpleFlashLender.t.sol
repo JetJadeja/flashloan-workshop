@@ -23,22 +23,22 @@ contract SimpleFlashLenderTest is DSTestPlus {
 
     function testLoan() public {
         GoodBorrower borrower = new GoodBorrower();
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
     function testLoanSuccess() public {
         GoodBorrower borrower = new GoodBorrower();
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
     function testFailRevertsIfNotReturned() public {
         BadBorrower borrower = new BadBorrower();
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
     function testFailRevertsIfSemiReturned() public {
         MistakenBorrower borrower = new MistakenBorrower();
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
 }

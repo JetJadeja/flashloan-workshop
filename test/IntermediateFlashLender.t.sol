@@ -18,37 +18,56 @@ contract IntermediateFlashLenderTest is DSTestPlus {
         token = new MockERC20("Test Token", "TEST", 18);
         lender = new IntermediateFlashLender(ERC20(address(token)), 0.05e18); // 5% fee
 
+        token.mint(address(this), 1000 ether);
+    }
+
+    function testDeposit() public {
         token.approve(address(lender), 1000 ether);
         lender.deposit(1000 ether);
     }
 
+    function testWithdraw() public {
+        testDeposit();
+        lender.withdraw(1000 ether);
+    }
+
     function testLoan() public {
+        testDeposit();
+
         GoodBorrower borrower = new GoodBorrower();
         token.mint(address(borrower), 50 ether);
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
     function testLoanSuccess() public {
+        testDeposit();
+
         GoodBorrower borrower = new GoodBorrower();
         token.mint(address(borrower), 50 ether);
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
     function testFailRevertsIfFeeNotReturned() public {
+        testDeposit();
+        
         CheapBorrower borrower = new CheapBorrower();
         token.mint(address(borrower), 50 ether);
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
     function testFailRevertsIfNotReturned() public {
+        testDeposit();
+        
         BadBorrower borrower = new BadBorrower();
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
     function testFailRevertsIfSemiReturned() public {
+        testDeposit();
+        
         MistakenBorrower borrower = new MistakenBorrower();
         token.mint(address(borrower), 50 ether);
-        lender.borrow(1000, IFlashBorrower(address(borrower)));
+        lender.borrow(1000 ether, IFlashBorrower(address(borrower)));
     }
 
     function testWithdrawFees() public {
